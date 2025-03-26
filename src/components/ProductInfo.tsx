@@ -1,8 +1,10 @@
 
 import { Product } from '@/utils/data';
-import { Star, Truck, Clock, ShieldCheck } from 'lucide-react';
+import { Star, Truck, Clock, ShieldCheck, ShoppingBag } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { useCart } from '@/context/CartContext';
 
 interface ProductInfoProps {
   product: Product;
@@ -12,6 +14,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
   const [selectedSize, setSelectedSize] = useState<string>(product.sizes.length > 0 ? product.sizes[0] : '');
   const [selectedColor, setSelectedColor] = useState<string>(product.colors.length > 0 ? product.colors[0] : '');
   const [quantity, setQuantity] = useState<number>(1);
+  const { addToCart } = useCart();
 
   const averageRating = product.reviews.length > 0 
     ? product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.reviews.length 
@@ -27,7 +30,7 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
       return;
     }
     
-    toast.success('Product added to cart!');
+    addToCart(product, quantity, selectedSize, selectedColor);
   };
 
   return (
@@ -120,15 +123,15 @@ const ProductInfo = ({ product }: ProductInfoProps) => {
           </div>
         </div>
         
-        <button 
+        <Button 
           onClick={handleAddToCart}
           disabled={!product.inStock}
-          className={`w-full btn-primary mb-4 ${
-            !product.inStock ? 'opacity-50 cursor-not-allowed' : ''
-          }`}
+          variant="default"
+          className="w-full mb-4 bg-7erfa-black hover:bg-7erfa-black/90 text-white py-6"
         >
+          <ShoppingBag size={18} className="mr-2" />
           {product.inStock ? 'Add to Cart' : 'Out of Stock'}
-        </button>
+        </Button>
         
         <div className="mt-8 space-y-4">
           <div className="flex items-center text-7erfa-gray-600">

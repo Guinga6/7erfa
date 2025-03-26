@@ -2,10 +2,12 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search, ShoppingBag, Menu, X } from 'lucide-react';
+import { useCart } from '@/context/CartContext';
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { getCartCount } = useCart();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -65,12 +67,12 @@ const Navbar = () => {
           <button className="p-2 text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300">
             <Search size={20} />
           </button>
-          <button className="p-2 text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300 relative">
+          <Link to="/cart" className="p-2 text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300 relative">
             <ShoppingBag size={20} />
             <span className="absolute -top-1 -right-1 bg-7erfa-gold text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              0
+              {getCartCount()}
             </span>
-          </button>
+          </Link>
           
           {/* Mobile menu button */}
           <button 
@@ -109,10 +111,17 @@ const Navbar = () => {
             </Link>
             <Link 
               to="/contact" 
-              className="text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300 pb-2"
+              className="text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300 border-b border-7erfa-gray-200 pb-2"
               onClick={() => setIsMenuOpen(false)}
             >
               Contact
+            </Link>
+            <Link 
+              to="/cart" 
+              className="text-7erfa-gray-700 hover:text-7erfa-black transition-all duration-300 pb-2"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Cart
             </Link>
           </nav>
         </div>
