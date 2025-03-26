@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProductById, Product, Review } from '@/utils/data';
@@ -21,25 +20,41 @@ const ProductDetail = () => {
   const [reviewComment, setReviewComment] = useState<string>('');
   const [reviews, setReviews] = useState<Review[]>([]);
   const { ref: productRef, isVisible: isProductVisible } = useScrollAnimation();
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Convert id to number and fetch product
-    const productId = parseInt(id || '0', 10);
-    const foundProduct = getProductById(productId);
+    console.log("ProductDetail component mounted, id:", id);
     
-    if (foundProduct) {
-      setProduct(foundProduct);
-      setReviews(foundProduct.reviews);
-      // Set default selections if available
-      if (foundProduct.sizes.length > 0) {
-        setSelectedSize(foundProduct.sizes[0]);
+    setLoading(true);
+    setError(null);
+    
+    try {
+      const productId = parseInt(id || '0', 10);
+      console.log("Looking for product with ID:", productId);
+      
+      const foundProduct = getProductById(productId);
+      console.log("Found product:", foundProduct);
+      
+      if (foundProduct) {
+        setProduct(foundProduct);
+        setReviews(foundProduct.reviews);
+        if (foundProduct.sizes.length > 0) {
+          setSelectedSize(foundProduct.sizes[0]);
+        }
+        if (foundProduct.colors.length > 0) {
+          setSelectedColor(foundProduct.colors[0]);
+        }
+        setLoading(false);
+      } else {
+        console.error("Product not found for ID:", productId);
+        setError(`Product with ID ${productId} not found`);
+        setLoading(false);
       }
-      if (foundProduct.colors.length > 0) {
-        setSelectedColor(foundProduct.colors[0]);
-      }
-    } else {
-      // Handle product not found
-      navigate('/products');
+    } catch (err) {
+      console.error("Error loading product:", err);
+      setError("Failed to load product details");
+      setLoading(false);
     }
   }, [id, navigate]);
 
@@ -80,7 +95,6 @@ const ProductDetail = () => {
       });
     }
     
-    // Reset form
     setReviewName('');
     setReviewComment('');
     setReviewRating(5);
@@ -88,26 +102,69 @@ const ProductDetail = () => {
     toast.success('Thank you for your review!');
   };
 
-  if (!product) {
+  if (loading) {
     return (
       <div className="min-h-screen">
         <Navbar />
         <div className="container-custom pt-28 pb-20 flex justify-center items-center">
-          <div className="shimmer w-full max-w-4xl h-64 bg-gray-200"></div>
+          <div className="shimmer w-full max-w-4xl h-64 bg-gray-200 animate-pulse"></div>
         </div>
         <Footer />
       </div>
     );
   }
 
-  const averageRating = product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.reviews.length;
+  if (error) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="container-custom pt-28 pb-20 flex flex-col justify-center items-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-red-600 mb-4">Error Loading Product</h2>
+            <p className="text-gray-700 mb-6">{error}</p>
+            <button 
+              onClick={() => navigate('/products')}
+              className="btn-primary"
+            >
+              Back to Products
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (!product) {
+    return (
+      <div className="min-h-screen">
+        <Navbar />
+        <div className="container-custom pt-28 pb-20 flex justify-center items-center">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Product Not Found</h2>
+            <p className="text-gray-700 mb-6">We couldn't find the product you were looking for.</p>
+            <button 
+              onClick={() => navigate('/products')}
+              className="btn-primary"
+            >
+              Browse Products
+            </button>
+          </div>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  const averageRating = product.reviews.length > 0 
+    ? product.reviews.reduce((acc, review) => acc + review.rating, 0) / product.reviews.length 
+    : 0;
 
   return (
     <div className="min-h-screen">
       <Navbar />
       
       <div className="pt-28 pb-20 container-custom">
-        {/* Back button */}
         <button 
           onClick={() => navigate(-1)}
           className="flex items-center text-7erfa-gray-600 hover:text-7erfa-black mb-8 transition-colors duration-300"
@@ -120,7 +177,6 @@ const ProductDetail = () => {
           ref={productRef as React.RefObject<HTMLDivElement>}
           className={`grid grid-cols-1 md:grid-cols-2 gap-12 opacity-0 ${isProductVisible ? 'animate-fadeIn' : ''}`}
         >
-          {/* Product Image */}
           <div className="product-image-wrapper aspect-square">
             <img 
               src={product.image} 
@@ -129,7 +185,6 @@ const ProductDetail = () => {
             />
           </div>
           
-          {/* Product Info */}
           <div>
             <span className="text-sm font-medium text-7erfa-gold uppercase tracking-wider">{product.category}</span>
             <h1 className="text-3xl font-bold text-7erfa-black mt-2 mb-4">{product.name}</h1>
@@ -157,7 +212,6 @@ const ProductDetail = () => {
             
             <p className="text-7erfa-gray-600 mb-8">{product.description}</p>
             
-            {/* Product Attributes */}
             <div className="mb-6">
               <div className="mb-6">
                 <h3 className="text-sm font-medium text-7erfa-black mb-3">Size</h3>
@@ -248,7 +302,6 @@ const ProductDetail = () => {
           </div>
         </div>
         
-        {/* Reviews Section */}
         <div className="mt-16 pt-8 border-t border-gray-200">
           <h2 className="text-2xl font-bold text-7erfa-black mb-8">Customer Reviews</h2>
           
@@ -262,7 +315,6 @@ const ProductDetail = () => {
             <p className="text-7erfa-gray-600 mb-8">No reviews yet. Be the first to review this product!</p>
           )}
           
-          {/* Write a Review Form */}
           <div className="max-w-xl mx-auto mt-16">
             <h3 className="text-xl font-bold text-7erfa-black mb-6">Write a Review</h3>
             <form onSubmit={handleSubmitReview}>
