@@ -1,5 +1,5 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Arabic:wght@300;400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -76,12 +76,9 @@
     --input: 0 0% 15%;
     --ring: 0 0% 80%;
   }
-}
 
-@layer base {
   * {
     @apply border-border;
-    font-family: 'Inter', sans-serif;
   }
   
   html {
@@ -94,6 +91,46 @@
   
   ::selection {
     @apply bg-7erfa-gold/20 text-7erfa-black;
+  }
+
+  [dir="rtl"] {
+    text-align: right;
+  }
+  
+  [dir="rtl"] .flex-row {
+    @apply flex-row-reverse;
+  }
+  
+  [dir="rtl"] .space-x-1,
+  [dir="rtl"] .space-x-2,
+  [dir="rtl"] .space-x-3,
+  [dir="rtl"] .space-x-4,
+  [dir="rtl"] .space-x-5,
+  [dir="rtl"] .space-x-6,
+  [dir="rtl"] .space-x-8,
+  [dir="rtl"] .space-x-10,
+  [dir="rtl"] .space-x-12 {
+    @apply space-x-reverse;
+  }
+  
+  [dir="rtl"] .ms-auto {
+    @apply ml-0 mr-auto;
+  }
+  
+  [dir="rtl"] .ms-1,
+  [dir="rtl"] .ms-2,
+  [dir="rtl"] .ms-3,
+  [dir="rtl"] .ms-4 {
+    margin-left: 0;
+    margin-right: 0.25rem;
+  }
+  
+  [dir="rtl"] .me-1,
+  [dir="rtl"] .me-2,
+  [dir="rtl"] .me-3,
+  [dir="rtl"] .me-4 {
+    margin-right: 0;
+    margin-left: 0.25rem;
   }
 }
 

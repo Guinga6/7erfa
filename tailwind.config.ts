@@ -123,6 +123,7 @@ export default {
       fontFamily: {
         sans: ['Inter', 'system-ui', 'sans-serif'],
         serif: ['Georgia', 'serif'],
+        arabic: ['Noto Sans Arabic', 'system-ui', 'sans-serif'],
       },
       transitionDuration: {
         '2000': '2000ms',
