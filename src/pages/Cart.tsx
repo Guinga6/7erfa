@@ -19,6 +19,7 @@ import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/components/ui/input';
+import { saveOrder } from '@/lib/supabase';
 
 // Define the schema for customer information
 const orderFormSchema = z.object({
@@ -53,26 +54,36 @@ const Cart = () => {
     },
   });
 
-  const handleSubmitOrder = (data: OrderFormValues) => {
+  const handleSubmitOrder = async (data: OrderFormValues) => {
     setIsCheckingOut(true);
     
-    // Create an order object combining cart items and customer info
-    const orderDetails = {
-      items: cart,
-      customer: data,
-      total: (getCartTotal() + (getCartTotal() > 100 ? 0 : 10)).toFixed(2),
-      orderDate: new Date().toISOString(),
-    };
-    
-    console.log('Order details:', orderDetails);
-    
-    // Simulate order processing
-    setTimeout(() => {
+    try {
+      // Create an order object combining cart items and customer info
+      const orderDetails = {
+        customer_name: data.fullName,
+        customer_email: data.email,
+        customer_address: data.address,
+        customer_city: data.city,
+        customer_zip: data.zipCode,
+        customer_country: data.country,
+        customer_phone: data.phone,
+        order_items: cart,
+        order_total: getCartTotal() + (getCartTotal() > 100 ? 0 : 10),
+        status: 'pending' as const,
+      };
+      
+      // Save order to Supabase
+      await saveOrder(orderDetails);
+      
       clearCart();
       toast.success('Order placed successfully!');
       navigate('/');
+    } catch (error) {
+      console.error('Error saving order:', error);
+      toast.error('There was a problem processing your order. Please try again.');
+    } finally {
       setIsCheckingOut(false);
-    }, 2000);
+    }
   };
 
   const handleInitiateCheckout = () => {
