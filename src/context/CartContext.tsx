@@ -18,6 +18,7 @@ interface CartContextType {
   clearCart: () => void;
   getCartTotal: () => number;
   getCartCount: () => number;
+  totalItems: number; // Added totalItems property
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
@@ -32,6 +33,7 @@ export const useCart = () => {
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
+  const [totalItems, setTotalItems] = useState<number>(0); // New state for totalItems
 
   // Load cart from localStorage on initial render
   useEffect(() => {
@@ -46,8 +48,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Save cart to localStorage whenever it changes
+  // Update totalItems whenever cart changes
   useEffect(() => {
+    setTotalItems(getCartCount());
+    // Save cart to localStorage whenever it changes
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
@@ -124,6 +128,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         clearCart,
         getCartTotal,
         getCartCount,
+        totalItems: getCartCount(), // Provide totalItems directly
       }}
     >
       {children}
